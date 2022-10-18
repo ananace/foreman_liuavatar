@@ -10,7 +10,7 @@ Follow the Foreman manual for [advanced installation from gems](https://theforem
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/ananace/foreman_liuavatar
+Bug reports and pull requests are welcome on the LiU GitLab at https://gitlab.liu.se/ITI/foreman_liuavatar or GitHub at https://github.com/ananace/foreman_liuavatar
 
 
 ## License
