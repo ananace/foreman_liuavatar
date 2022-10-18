@@ -11,9 +11,9 @@ module ForemanLiuavatar
     end
 
     config.to_prepare do
-      ::User.send :prepend, ForemanLiuavatar::UserExtensions
-    rescue => e
-      Rails.logger.warn "ForemanVmwareAdvanced: skipping engine hook(#{e})"
+      ::User.prepend ForemanLiuavatar::UserExtensions
+    rescue StandardError => e
+      Rails.logger.warn "ForemanLiuAvatar: skipping engine hook(#{e})"
     end
   end
 end
