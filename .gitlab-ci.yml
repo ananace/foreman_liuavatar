@@ -82,7 +82,10 @@ test:
   script:
     # Foreman-side tasks
     - cd "$FOREMAN_DIR"
-    - '[ -d "$CI_PROJECT_DIR/test" ] && bundle exec rake "test:$CI_FOREMAN_PLUGIN"'
+    - if [ -d "$CI_PROJECT_DIR/test" ]; then
+      bundle exec rake "test:$CI_FOREMAN_PLUGIN"
+      mv jenkins/reports "$CI_PROJECT_DIR"
+      fi
     - '[ -d "$CI_PROJECT_DIR/app/assets" ] && RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"'
 
     # Plugin-side tasks
@@ -93,3 +96,5 @@ test:
     paths:
       - '*.gem'
       - 'public'
+    reports:
+      junit: reports/unit/*.xml
