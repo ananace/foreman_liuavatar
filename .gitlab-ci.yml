@@ -10,14 +10,14 @@ services:
   - name: postgres:13-alpine
     alias: db
 
-cache:
-  paths:
-    - vendor/ruby
-  when: always
-
 image: ruby:2.7
 
 lint:
+  cache:
+    paths:
+      - vendor/ruby
+    when: always
+
   script:
     - gem install bundler -N
     - bundle config set path vendor
@@ -34,6 +34,13 @@ test:
           - 3.2-stable
           - 3.3-stable
           - 3.4-stable
+
+  cache:
+    key: foreman-$FOREMAN_VERSION
+    paths:
+      - vendor/ruby
+      - node_modules
+    when: always
 
   variables:
     RAILS_ENV: test
@@ -63,6 +70,10 @@ test:
     - "echo \"gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'\" > bundler.d/local.rb"
     - bundle install -j $(nproc) --retry=3
     - bundle exec rake db:migrate
+
+    - ln -s node_modules "$CI_PROJECT_DIR/node_modules"
+    - mkdir "$CI_PROJECT_DIR/node_modules"
+    - npm install
   script:
     # Foreman-side tasks
     - cd "$FOREMAN_DIR"
