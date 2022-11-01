@@ -52,7 +52,7 @@ test:
     # Set up Ruby build dependencies
     - apt-get update -yqq
     - apt-get install -yqq build-essential libcurl4-openssl-dev postgresql-client-13 zlib1g-dev libpq-dev
-    - '[ -n "$CI_FOREMAN_WEB" ] && apt-get install -yqq --no-install-recommends npm'
+    - apt-get install -yqq --no-install-recommends npm
     - gem install bundler -N
 
     # Install foreman
