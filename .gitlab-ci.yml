@@ -73,7 +73,7 @@ test:
 
     - mkdir -p "$CI_PROJECT_DIR/node_modules"
     - ln -s "$CI_PROJECT_DIR/node_modules" node_modules
-    - npm install
+    - npm install --legacy-peer-deps
     - bundle exec rake webpack:compile
   script:
     # Foreman-side tasks
