@@ -4,6 +4,9 @@
 require 'test_helper'
 require 'database_cleaner'
 
+# Avoid Psych errors
+Foreman::Application.config.active_record.use_yaml_unsafe_load
+
 # Add plugin to FactoryBot's paths
 FactoryBot.definition_file_paths << File.join(File.dirname(__FILE__), 'factories')
 FactoryBot.reload

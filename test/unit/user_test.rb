@@ -11,7 +11,7 @@ class UserTest < ActiveSupport::TestCase
     test 'it should retrieve and store the avatar' do
       resp = mock
       resp.expects(:value).once
-      resp.expects(:body).twice.returns(Base64.decode64(img))
+      resp.expects(:body).once.returns(Base64.decode64(img))
 
       Net::HTTP.expects(:get_response)
                .with(URI('https://liu.se/-/media/employeeimages/12/employee_image_liuid12.jpeg'))
@@ -24,6 +24,25 @@ class UserTest < ActiveSupport::TestCase
 
       user.refresh_avatar!
     end
+
+    test 'it should not update the avatar when unchanged' do
+      resp = mock
+      resp.expects(:value).once
+      resp.expects(:body).once.returns(Base64.decode64(img))
+
+      Net::HTTP.expects(:get_response)
+               .with(URI('https://liu.se/-/media/employeeimages/12/employee_image_liuid12.jpeg'))
+               .once
+               .returns resp
+
+      user.expects(:avatar_hash).once.returns '2a1cd7509bf3efad8f8df0511115afef62b9e9a1'
+
+      File.expects(:write).never
+      user.expects(:avatar_hash=).never
+      user.expects(:save).never
+
+      user.refresh_avatar!
+    end
   end
 
   context 'with valid - if odd - LiU-user' do
@@ -32,7 +51,7 @@ class UserTest < ActiveSupport::TestCase
     test 'it should retrieve and store the avatar' do
       resp = mock
       resp.expects(:value).once
-      resp.expects(:body).twice.returns(Base64.decode64(img))
+      resp.expects(:body).once.returns(Base64.decode64(img))
 
       Net::HTTP.expects(:get_response)
                .with(URI('https://liu.se/-/media/employeeimages/99/employee_image_a99.jpeg'))
