@@ -14,6 +14,7 @@ lint:
   image: ruby:2.7
   script:
     - gem install bundler -N
+    - bundle config set path vendor
     - bundle install -j $(nproc) --retry=3
     - bundle exec rubocop app/ lib/
 
@@ -34,6 +35,7 @@ test:
     RAILS_ENV: test
     DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DB
     DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: "true"
+
   cache:
     paths:
       - vendor/ruby
@@ -43,12 +45,14 @@ test:
     # Set up Ruby build dependencies
     - apt-get update -yqq
     - apt-get install -yqq build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+    - apt-get install -yqq --no-install-recommends npm
     - gem install bundler -N
 
     # Install foreman
     - FOREMAN_DIR="$(dirname "$CI_PROJECT_DIR")/foreman"
     - git clone -b "$FOREMAN" --depth=1 -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
     - cd "$FOREMAN_DIR"
+    - bundle config set path "$CI_PROJECT_DIR/vendor"
     - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
     - bundle install -j $(nproc) --retry=3
 
