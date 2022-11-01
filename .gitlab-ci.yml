@@ -29,11 +29,11 @@ test:
   parallel:
     matrix:
       - FOREMAN_VERSION:
-          - 2.5-stable
-          # - 3.0-stable
-          # - 3.1-stable
-          # - 3.2-stable
-          # - 3.3-stable
+          # - 2.5-stable
+          - 3.0-stable
+          - 3.1-stable
+          - 3.2-stable
+          - 3.3-stable
           - 3.4-stable
 
   cache:
@@ -62,12 +62,6 @@ test:
     - bundle config set path "$CI_PROJECT_DIR/vendor"
     - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
     - bundle install -j $(nproc) --retry=3
-
-    - |
-      if [ "$FOREMAN_VERSION" = "2.5-stable" ]; then
-        echo "Applying Psych error workaround..."
-        sed -e '/queue_adapter/a config.active_record.use_yaml_unsafe_load' -i "$FOREMAN_DIR/config/application.rb"
-      fi
 
     # Configure database
     - bundle exec rake db:create
