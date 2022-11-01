@@ -66,7 +66,7 @@ test:
     - |
       if [ "$FOREMAN_VERSION" = "2.5-stable" ]; then
         echo "Applying Psych error workaround..."
-        sed -e '/queue_adapter/a config.active_record.use_yaml_unsafe_load' "$FOREMAN_DIR/config/application.rb"
+        sed -e '/queue_adapter/a config.active_record.use_yaml_unsafe_load' -i "$FOREMAN_DIR/config/application.rb"
       fi
 
     # Configure database
