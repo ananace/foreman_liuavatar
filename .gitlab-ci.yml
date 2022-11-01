@@ -82,7 +82,8 @@ test:
   script:
     # Foreman-side tasks
     - cd "$FOREMAN_DIR"
-    - if [ -d "$CI_PROJECT_DIR/test" ]; then
+    - |
+      if [ -d "$CI_PROJECT_DIR/test" ]; then
       bundle exec rake "test:$CI_FOREMAN_PLUGIN"
       mv jenkins/reports "$CI_PROJECT_DIR"
       fi
