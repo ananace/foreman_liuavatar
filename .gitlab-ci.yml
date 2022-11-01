@@ -85,7 +85,7 @@ test:
     - |
       if [ -d "$CI_PROJECT_DIR/test" ]; then
       bundle exec rake "test:$CI_FOREMAN_PLUGIN"
-      mv jenkins/reports "$CI_PROJECT_DIR"
+      [ -d 'jenkins/reports' ] && mv jenkins/reports "$CI_PROJECT_DIR"
       fi
     - '[ -d "$CI_PROJECT_DIR/app/assets" ] && RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"'
 
