@@ -10,8 +10,14 @@ services:
   - name: postgres:alpine
     alias: db
 
+cache:
+  paths:
+    - vendor/ruby
+  when: always
+
+image: ruby:2.7
+
 lint:
-  image: ruby:2.7
   script:
     - gem install bundler -N
     - bundle config set path vendor
@@ -21,9 +27,7 @@ lint:
 test:
   parallel:
     matrix:
-      - RUBY:
-          - '2.7'
-        FOREMAN:
+      - FOREMAN_VERSION:
           - 2.5-stable
           - 3.0-stable
           - 3.1-stable
@@ -36,21 +40,16 @@ test:
     DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DB
     DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: "true"
 
-  cache:
-    paths:
-      - vendor/ruby
-
-  image: ruby:$RUBY
   before_script:
     # Set up Ruby build dependencies
     - apt-get update -yqq
-    - apt-get install -yqq build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+    - apt-get install -yqq build-essential libcurl4-openssl-dev postgresql-client zlib1g-dev libpq-dev
     - apt-get install -yqq --no-install-recommends npm
     - gem install bundler -N
 
     # Install foreman
     - FOREMAN_DIR="$(dirname "$CI_PROJECT_DIR")/foreman"
-    - git clone -b "$FOREMAN" --depth=1 -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
+    - git clone -b "$FOREMAN_VERSION" --depth=1 -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
     - cd "$FOREMAN_DIR"
     - bundle config set path "$CI_PROJECT_DIR/vendor"
     - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
@@ -61,20 +60,14 @@ test:
     - bundle exec rake db:migrate
 
     # Install plugin
-    - |
-      echo "gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'" \
-        > bundler.d/local.rb
+    - "echo \"gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'\" > bundler.d/local.rb"
     - bundle install -j $(nproc) --retry=3
     - bundle exec rake db:migrate
   script:
     # Foreman-side tasks
     - cd "$FOREMAN_DIR"
-    - |
-      [ -d "$CI_PROJECT_DIR/test" ] && \
-        bundle exec rake test:$CI_FOREMAN_PLUGIN
-    - |
-      [ -d "$CI_PROJECT_DIR/app/assets" ] && \
-        RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"
+    - '[ -d "$CI_PROJECT_DIR/test" ] && bundle exec rake "test:$CI_FOREMAN_PLUGIN"'
+    - '[ -d "$CI_PROJECT_DIR/app/assets" ] && RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"'
 
     # Plugin-side tasks
     - cd "$CI_PROJECT_DIR"
