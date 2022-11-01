@@ -63,6 +63,12 @@ test:
     - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
     - bundle install -j $(nproc) --retry=3
 
+    - |
+      if [ "$FOREMAN_VERSION" = "2.5-stable" ]; then
+        echo "Applying Psych error workaround..."
+        sed -e '/queue_adapter/a config.active_record.use_yaml_unsafe_load' "$FOREMAN_DIR/config/application.rb"
+      fi
+
     # Configure database
     - bundle exec rake db:create
     - bundle exec rake db:migrate
