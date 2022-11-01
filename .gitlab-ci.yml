@@ -33,7 +33,7 @@ test:
   variables:
     RAILS_ENV: test
     DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DB
-    DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: true
+    DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: "true"
   cache:
     paths:
       - vendor/ruby
