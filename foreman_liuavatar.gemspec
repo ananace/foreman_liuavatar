@@ -15,11 +15,11 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/ananace/foreman_liuavatar'
   spec.license       = 'GPL-3.0'
 
-  spec.required_ruby_version = '>= 2.5.0'
+  spec.files         = Dir['{app,lib}/**/*.{rake,rb}'] + %w[LICENSE.txt Rakefile README.md]
+  spec.test_files    = Dir['test/**/*.rb']
 
-  spec.files         = Dir['{app,lib}/**/*.{rake,rb}'] + %w[LICENSE.txt README.md]
-  spec.require_paths = ['lib']
-
-  spec.add_development_dependency 'bundler'
-  spec.add_development_dependency 'rake'
+  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'rubocop-minitest'
+  spec.add_development_dependency 'rubocop-performance'
+  spec.add_development_dependency 'rubocop-rails'
 end

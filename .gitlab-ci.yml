@@ -1,0 +1,78 @@
+---
+variables:
+  CI_FOREMAN_PLUGIN: foreman_liuavatar
+
+  POSTGRES_DB: test
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+
+services:
+  - name: postgres:alpine
+    alias: db
+
+lint:
+  image: ruby:2.7
+  script:
+    - gem install bundler -N
+    - bundle install -j $(nproc) --retry=3
+    - bundle exec rubocop app/ lib/
+
+test:
+  parallel:
+    matrix:
+      - RUBY:
+          - '2.7'
+        FOREMAN:
+          - 2.5-stable
+          - 3.0-stable
+          - 3.1-stable
+          - 3.2-stable
+          - 3.3-stable
+          - 3.4-stable
+
+  variables:
+    RAILS_ENV: test
+    DATABASE_URL: postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@db/$POSTGRES_DB
+    DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL: true
+  cache:
+    paths:
+      - vendor/ruby
+
+  image: ruby:$RUBY
+  before_script:
+    # Set up Ruby build dependencies
+    - apt-get update -yqq
+    - apt-get install -yqq build-essential libcurl4-openssl-dev zlib1g-dev libpq-dev
+    - gem install bundler -N
+
+    # Install foreman
+    - FOREMAN_DIR="$(dirname "$CI_PROJECT_DIR")/foreman"
+    - git clone -b "$FOREMAN" --shallow -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
+    - cd "$FOREMAN_DIR"
+    - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
+    - bundle install -j $(nproc) --retry=3
+
+    # Configure database
+    - bundle exec rake db:create
+    - bundle exec rake db:migrate
+
+    # Install plugin
+    - echo "gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'" > bundler.d/local.rb
+    - bundle install -j $(nproc) --retry=3
+    - bundle exec rake db:migrate
+  script:
+    # Foreman-side tasks
+    - cd "$FOREMAN_DIR"
+    - [ -d "$CI_PROJECT_DIR/test" ] && \
+        bundle exec rake test:$CI_FOREMAN_PLUGIN
+    - [ -d "$CI_PROJECT_DIR/app/assets" ] && \
+        RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"
+
+    # Plugin-side tasks
+    - cd "$CI_PROJECT_DIR"
+    - gem build "*.gemspec"
+
+  artifacts:
+    paths:
+      - '*.gem'
+      - 'public'
