@@ -47,7 +47,7 @@ test:
 
     # Install foreman
     - FOREMAN_DIR="$(dirname "$CI_PROJECT_DIR")/foreman"
-    - git clone -b "$FOREMAN" --shallow -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
+    - git clone -b "$FOREMAN" --depth=1 -- https://github.com/theforeman/foreman "$FOREMAN_DIR"
     - cd "$FOREMAN_DIR"
     - bundle config set without console development ec2 gce journald libvirt openstack ovirt sqlite vmware
     - bundle install -j $(nproc) --retry=3
