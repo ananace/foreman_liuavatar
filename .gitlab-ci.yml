@@ -57,15 +57,19 @@ test:
     - bundle exec rake db:migrate
 
     # Install plugin
-    - echo "gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'" > bundler.d/local.rb
+    - |
+      echo "gem '$CI_FOREMAN_PLUGIN', path: '$CI_PROJECT_DIR'" \
+        > bundler.d/local.rb
     - bundle install -j $(nproc) --retry=3
     - bundle exec rake db:migrate
   script:
     # Foreman-side tasks
     - cd "$FOREMAN_DIR"
-    - [ -d "$CI_PROJECT_DIR/test" ] && \
+    - |
+      [ -d "$CI_PROJECT_DIR/test" ] && \
         bundle exec rake test:$CI_FOREMAN_PLUGIN
-    - [ -d "$CI_PROJECT_DIR/app/assets" ] && \
+    - |
+      [ -d "$CI_PROJECT_DIR/app/assets" ] && \
         RAILS_ENV=production bundle exec rake "plugin:assets:precompile[$CI_FOREMAN_PLUGIN]"
 
     # Plugin-side tasks
