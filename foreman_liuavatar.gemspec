@@ -16,7 +16,6 @@ Gem::Specification.new do |spec|
   spec.license       = 'GPL-3.0'
 
   spec.files         = Dir['{app,lib}/**/*.{rake,rb}'] + %w[LICENSE.txt Rakefile README.md]
-  spec.test_files    = Dir['test/**/*.rb']
 
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rubocop-minitest'
