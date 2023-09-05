@@ -6,13 +6,13 @@ module ForemanLiuavatar
       avatar = retrieve_liu_avatar
       return unless avatar
 
-      hash = Digest::SHA1.hexdigest(avatar)
-      return if hash == avatar_hash
-
       path = "#{Rails.public_path}/images/avatars/#{hash}.jpg"
-      File.write(path, avatar, mode: 'wb')
+      hash = Digest::SHA1.hexdigest(avatar)
+      return if File.exist?(path) && hash == avatar_hash
 
+      File.write(path, avatar, mode: 'wb')
       self.avatar_hash = hash
+
       save
     end
 
