@@ -4,9 +4,11 @@ module ForemanLiuavatar
   class Engine < ::Rails::Engine
     engine_name 'foreman_liuavatar'
 
-    initializer 'foreman_liuavatar.register_plugin', before: :finisher_hook do |_app|
-      Foreman::Plugin.register :foreman_liuavatar do
-        requires_foreman '>= 1.14'
+    initializer 'foreman_liuavatar.register_plugin', before: :finisher_hook do |app|
+      app.reloader.to_prepare do
+        Foreman::Plugin.register :foreman_liuavatar do
+          requires_foreman '>= 3.12'
+        end
       end
     end
 
