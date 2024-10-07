@@ -37,6 +37,7 @@ class UserTest < ActiveSupport::TestCase
 
       user.expects(:avatar_hash).once.returns '2a1cd7509bf3efad8f8df0511115afef62b9e9a1'
 
+      File.expects(:exist?).once.returns true
       File.expects(:write).never
       user.expects(:avatar_hash=).never
       user.expects(:save).never
